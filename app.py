@@ -19,6 +19,11 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 
 app = Flask(__name__)
 
+@app.route('/')
+def health_check():
+    """Endpoint simples para verificação de saúde da plataforma."""
+    return "OK", 200
+
 # --- CONFIGURAÇÕES IMPORTANTES ---
 # É altamente recomendável usar variáveis de ambiente em vez de colar as chaves aqui.
 os.environ["GOOGLE_API_KEY"] = "AIzaSyAZcLXqpNirS5DhsYFwWkSAMju24eIFJl0"
