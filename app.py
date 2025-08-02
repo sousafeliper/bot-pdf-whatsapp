@@ -4,13 +4,6 @@ import requests
 import time
 import json
 
-# --- Lógica do Gevent (se Gunicorn usar o worker gevent) ---
-from gevent import monkey
-# A linha abaixo é importante se você usar o worker 'gevent' no Gunicorn
-# Ex: gunicorn --worker-class gevent -w 4 app:app
-monkey.patch_all()
-
-
 # --- Importações Essenciais ---
 from flask import Flask, request, jsonify
 from twilio.rest import Client
