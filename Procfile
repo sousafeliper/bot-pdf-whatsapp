@@ -1,2 +1,1 @@
-release: mkdir -p faiss_indices && echo "{}" > sessions.json
-web: gunicorn --worker-class gevent --bind 0.0.0.0:$PORT app:app
+web: gunicorn --worker-class sync --bind 0.0.0.0:$PORT app:app
