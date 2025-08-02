@@ -222,14 +222,14 @@ def get_user_pdf_name(user_waid):
     return user_sessions.get(user_waid, {}).get("pdf_name", None)
 
 
-# --- INICIALIZAÇÃO DA APLICAÇÃO ---
-# Carrega as sessões existentes quando o worker do Gunicorn inicia.
-load_sessions()
 
 
 # --- ENDPOINT PRINCIPAL: WEBHOOK DA TWILIO ---
 @app.route('/webhook', methods=['POST'])
 def webhook():
+    # NOVO: Carrega as sessões no início de cada requisição
+    load_sessions()
+
     data = request.form
     print(f"Mensagem recebida do WhatsApp (Twilio Payload): {data}")
 
