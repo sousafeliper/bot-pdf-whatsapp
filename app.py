@@ -21,6 +21,15 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
+# Garante que as pastas e arquivos necessários existam na inicialização
+if not os.path.exists("faiss_indices"):
+    os.makedirs("faiss_indices")
+if not os.path.exists("temp_pdfs"):
+    os.makedirs("temp_pdfs")
+if not os.path.exists("sessions.json"):
+    with open("sessions.json", "w") as f:
+        f.write("{}") # Cria um arquivo JSON vazio
+
 app = Flask(__name__)
 
 # --- CONFIGURAÇÕES IMPORTANTES ---
