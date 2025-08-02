@@ -294,19 +294,12 @@ def webhook():
 
     return jsonify({"status": "ok"})
 
-
-# --- Executa o Servidor Flask ---
+# --- Executa o Servidor Flask (COMPATÍVEL COM GUNICORN) ---
 if __name__ == '__main__':
-    print("Iniciando servidor Flask...")
+    print("Iniciando servidor Flask localmente...")
+    print("Para deploy, o Gunicorn assume o controle.")
 
-    # Carrega as sessões de um arquivo ao iniciar.
-    # Quando executado com Gunicorn, esta lógica precisa estar no nível do módulo
-    # para garantir que seja executada quando o worker é iniciado.
-    # Por enquanto, mantemos aqui para consistência e testes locais.
-    load_sessions()
-
-    print("\n--- ATENÇÃO: CERTIFIQUE-SE DE TER SUAS CREDENCIAIS TWILIO E GEMINI PREENCHIDAS! ---")
-    print("Bot aguardando o envio de PDF pelo usuário...")
-
-    # A lógica de iniciar o servidor agora é controlada pelo Procfile/Gunicorn.
-    # O servidor de desenvolvimento do Flask (app.run) ou WSGIServer não é mais iniciado aqui.
+    # A lógica abaixo é para rodar localmente, caso você queira
+    # Rodar o servidor de desenvolvimento do Flask. Em produção,
+    # o Gunicorn ignora este bloco e usa o Procfile.
+    app.run(host='0.0.0.0', port=5000, debug=True)
