@@ -3,10 +3,7 @@ import uuid
 import requests
 import time
 import json
-
-# --- Lógica do Gevent para Servidor de Produção ---
-from gevent.pywsgi import WSGIServer
-from gevent import monkey
+import gunicorn
 
 # monkey.patch_all() deve ser chamado o mais cedo possível
 if os.getenv("GEVENT_SUPPORT") == "True":
