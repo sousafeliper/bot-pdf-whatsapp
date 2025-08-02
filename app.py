@@ -1,13 +1,15 @@
-from gevent.pywsgi import WSGIServer
-from gevent import monkey
-monkey.patch_all()
-
 import os
 import uuid
 import requests
 import time
 import json
-import gunicorn
+
+# --- Lógica do Gevent (se Gunicorn usar o worker gevent) ---
+from gevent import monkey
+# A linha abaixo é importante se você usar o worker 'gevent' no Gunicorn
+# Ex: gunicorn --worker-class gevent -w 4 app:app
+monkey.patch_all()
+
 
 # --- Importações Essenciais ---
 from flask import Flask, request, jsonify
@@ -21,14 +23,6 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
-# Garante que as pastas e arquivos necessários existam na inicialização
-if not os.path.exists("faiss_indices"):
-    os.makedirs("faiss_indices")
-if not os.path.exists("temp_pdfs"):
-    os.makedirs("temp_pdfs")
-if not os.path.exists("sessions.json"):
-    with open("sessions.json", "w") as f:
-        f.write("{}") # Cria um arquivo JSON vazio
 
 app = Flask(__name__)
 
@@ -53,18 +47,28 @@ def save_sessions():
 
 
 def load_sessions():
-    """Carrega o dicionário de sessões de um arquivo JSON se ele existir."""
+    """Carrega o dicionário de sessões de um arquivo JSON."""
     global user_sessions
-    if os.path.exists('sessions.json'):
+    sessions_file = 'sessions.json'
+
+    # NOVO: Garante que a pasta e o arquivo de sessão existam
+    if not os.path.exists("faiss_indices"):
+        os.makedirs("faiss_indices")
+    if not os.path.exists(sessions_file):
+        with open(sessions_file, "w") as f:
+            f.write("{}")
+
+    # Verifica se o arquivo não está vazio antes de tentar carregar
+    if os.path.getsize(sessions_file) > 0:
         try:
-            with open('sessions.json', 'r') as f:
+            with open(sessions_file, 'r') as f:
                 user_sessions = json.load(f)
             print(f"Sessões carregadas de sessions.json. {len(user_sessions)} usuários ativos.")
         except json.JSONDecodeError:
-            print("Arquivo sessions.json encontrado, mas está corrompido. Iniciando com sessões vazias.")
+            print("Erro ao decodificar sessions.json. O arquivo pode estar corrompido. Iniciando com sessões vazias.")
             user_sessions = {}
     else:
-        print("Nenhum arquivo de sessão encontrado. Iniciando com sessões vazias.")
+        print("Arquivo de sessão vazio. Iniciando com sessões vazias.")
 
 
 # --- Funções de Processamento, Download e Envio ---
@@ -218,7 +222,12 @@ def get_user_pdf_name(user_waid):
     return user_sessions.get(user_waid, {}).get("pdf_name", None)
 
 
-# --- Endpoint Principal: Webhook da Twilio ---
+# --- INICIALIZAÇÃO DA APLICAÇÃO ---
+# Carrega as sessões existentes quando o worker do Gunicorn inicia.
+load_sessions()
+
+
+# --- ENDPOINT PRINCIPAL: WEBHOOK DA TWILIO ---
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.form
