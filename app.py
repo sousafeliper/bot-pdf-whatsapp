@@ -44,9 +44,11 @@ def load_sessions():
     global user_sessions
     sessions_file = 'sessions.json'
 
-    # NOVO: Garante que a pasta e o arquivo de sessão existam
+    # Garante que as pastas e o arquivo de sessão existam
     if not os.path.exists("faiss_indices"):
         os.makedirs("faiss_indices")
+    if not os.path.exists("temp_pdfs"):
+        os.makedirs("temp_pdfs")
     if not os.path.exists(sessions_file):
         with open(sessions_file, "w") as f:
             f.write("{}")
@@ -215,12 +217,10 @@ def get_user_pdf_name(user_waid):
     return user_sessions.get(user_waid, {}).get("pdf_name", None)
 
 
-
-
 # --- ENDPOINT PRINCIPAL: WEBHOOK DA TWILIO ---
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    # NOVO: Carrega as sessões no início de cada requisição
+    # Carrega as sessões no início de cada requisição
     load_sessions()
 
     data = request.form
