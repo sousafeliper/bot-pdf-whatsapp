@@ -24,24 +24,40 @@ def health_check():
     """Endpoint simples para verificação de saúde da plataforma."""
     return "OK", 200
     
-# --- CONFIGURAÇÕES IMPORTANTES ---
-# Lê as credenciais das variáveis de ambiente configuradas na plataforma.
+# --- CONFIGURAÇÕES IMPORTANTES (MODO DE DEBUG) ---
+print("--- INICIANDO VERIFICAÇÃO DE AMBIENTE ---")
+try:
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+    TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+    TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
+    print(f"GOOGLE_API_KEY Encontrada: {'Sim' if GOOGLE_API_KEY else 'NÃO'}")
+    print(f"TWILIO_ACCOUNT_SID Encontrada: {'Sim' if TWILIO_ACCOUNT_SID else 'NÃO'}")
+    print(f"TWILIO_AUTH_TOKEN Encontrado: {'Sim' if TWILIO_AUTH_TOKEN else 'NÃO'}")
+    print(f"TWILIO_WHATSAPP_NUMBER Encontrado: {'Sim' if TWILIO_WHATSAPP_NUMBER else 'NÃO'}")
 
-# Define a chave de API do Google para a biblioteca da LangChain
-if GOOGLE_API_KEY:
-    os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
-else:
-    # Causa um erro claro se a chave estiver faltando, facilitando o debug.
-    raise ValueError("A variável de ambiente GOOGLE_API_KEY não foi configurada.")
+    # Define a chave de API do Google para a biblioteca da LangChain
+    if GOOGLE_API_KEY:
+        os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+    else:
+        raise ValueError("A variável de ambiente GOOGLE_API_KEY não foi configurada.")
 
-# Verifica se as credenciais da Twilio foram carregadas
-if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER]):
-    raise ValueError("Uma ou mais variáveis de ambiente da Twilio não foram configuradas.")
+    # Verifica se as credenciais da Twilio foram carregadas
+    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER]):
+        raise ValueError("Uma ou mais variáveis de ambiente da Twilio não foram configuradas.")
+
+    print("--- VERIFICAÇÃO DE AMBIENTE CONCLUÍDA COM SUCESSO ---")
+
+except Exception as e:
+    # Esta é a parte crucial. Imprime o erro de forma explícita.
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(f"!!!!!! ERRO CRÍTICO NA INICIALIZAÇÃO DA APLICAÇÃO !!!!!!")
+    print(f"!!!!!! DETALHE DO ERRO: {e} !!!!!!")
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    # Força o processo a sair com um código de erro para garantir que a falha seja registrada.
+    import sys
+    sys.exit(1)
 
 # Dicionário global para gerenciar as sessões dos usuários (carregado na inicialização)
 user_sessions = {}
