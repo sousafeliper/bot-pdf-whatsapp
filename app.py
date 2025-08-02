@@ -293,13 +293,3 @@ def webhook():
                               "Não entendi sua mensagem. Envie um PDF ou faça uma pergunta sobre um documento já enviado.")
 
     return jsonify({"status": "ok"})
-
-# --- Executa o Servidor Flask (COMPATÍVEL COM GUNICORN) ---
-if __name__ == '__main__':
-    print("Iniciando servidor Flask localmente...")
-    print("Para deploy, o Gunicorn assume o controle.")
-
-    # A lógica abaixo é para rodar localmente, caso você queira
-    # Rodar o servidor de desenvolvimento do Flask. Em produção,
-    # o Gunicorn ignora este bloco e usa o Procfile.
-    app.run(host='0.0.0.0', port=5000, debug=True)
