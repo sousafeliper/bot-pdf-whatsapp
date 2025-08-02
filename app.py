@@ -23,13 +23,25 @@ app = Flask(__name__)
 def health_check():
     """Endpoint simples para verificação de saúde da plataforma."""
     return "OK", 200
-
+    
 # --- CONFIGURAÇÕES IMPORTANTES ---
-# É altamente recomendável usar variáveis de ambiente em vez de colar as chaves aqui.
-os.environ["GOOGLE_API_KEY"] = "AIzaSyAZcLXqpNirS5DhsYFwWkSAMju24eIFJl0"
-TWILIO_ACCOUNT_SID = "ACfc3823b8084d0fd4312885a381db8fe8"
-TWILIO_AUTH_TOKEN = "0132c8178dd6db012c3d08323c00b378"
-TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"
+# Lê as credenciais das variáveis de ambiente configuradas na plataforma.
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
+
+# Define a chave de API do Google para a biblioteca da LangChain
+if GOOGLE_API_KEY:
+    os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+else:
+    # Causa um erro claro se a chave estiver faltando, facilitando o debug.
+    raise ValueError("A variável de ambiente GOOGLE_API_KEY não foi configurada.")
+
+# Verifica se as credenciais da Twilio foram carregadas
+if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER]):
+    raise ValueError("Uma ou mais variáveis de ambiente da Twilio não foram configuradas.")
 
 # Dicionário global para gerenciar as sessões dos usuários (carregado na inicialização)
 user_sessions = {}
