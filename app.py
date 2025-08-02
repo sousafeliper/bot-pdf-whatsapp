@@ -1,16 +1,13 @@
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
+monkey.patch_all()
+
 import os
 import uuid
 import requests
 import time
 import json
 import gunicorn
-
-# monkey.patch_all() deve ser chamado o mais cedo possível
-if os.getenv("GEVENT_SUPPORT") == "True":
-    monkey.patch_all()
-    print("Gevent monkey-patching aplicado via variável de ambiente.")
-else:
-    print("Gevent monkey-patching NÃO aplicado (GEVENT_SUPPORT não é 'True').")
 
 # --- Importações Essenciais ---
 from flask import Flask, request, jsonify
